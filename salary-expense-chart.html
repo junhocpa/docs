@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>월급 350만 원 지출 구조 — 도넛 차트</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+                 "Malgun Gothic", "Noto Sans KR", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 32px 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    max-width: 760px;
+    width: 100%;
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .sub {
+    margin: 0 0 24px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .chart-wrap {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .donut { position: relative; flex: 0 0 auto; }
+  .center-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .center-label .total { font-size: 13px; color: var(--muted); }
+  .center-label .amount { font-size: 26px; font-weight: 800; }
+  .legend {
+    flex: 1 1 280px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    transition: background 0.15s;
+    cursor: default;
+  }
+  .legend-row:hover { background: rgba(255,255,255,0.06); }
+  .swatch { width: 14px; height: 14px; border-radius: 4px; flex: 0 0 auto; }
+  .legend-name { flex: 1; font-size: 14px; }
+  .legend-amount { font-variant-numeric: tabular-nums; font-size: 14px; color: var(--text); }
+  .legend-pct { font-size: 12px; color: var(--muted); width: 46px; text-align: right; }
+  .arc { transition: opacity 0.15s, transform 0.15s; transform-origin: 110px 110px; }
+  .arc.dim { opacity: 0.25; }
+  .arc.active { transform: scale(1.04); }
+  .footnote { margin-top: 22px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>월급 350만 원 지출 구조</h1>
+    <p class="sub">월 실수령액 3,500,000원 기준 · 가상 데이터</p>
+    <div class="chart-wrap">
+      <div class="donut">
+        <svg id="donut" width="220" height="220" viewBox="0 0 220 220"></svg>
+        <div class="center-label">
+          <span class="total">월 지출</span>
+          <span class="amount">350만</span>
+        </div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <p class="footnote">※ 항목별 금액은 예시이며 합계는 3,500,000원입니다.</p>
+  </div>
+
+<script>
+  const data = [
+    { name: "주거비 (월세·관리비)", value: 800000, color: "#60a5fa" },
+    { name: "저축·투자",          value: 700000, color: "#34d399" },
+    { name: "식비",               value: 600000, color: "#fbbf24" },
+    { name: "문화·여가",          value: 300000, color: "#f472b6" },
+    { name: "기타·생활용품",      value: 250000, color: "#a78bfa" },
+    { name: "비상금",             value: 250000, color: "#22d3ee" },
+    { name: "교통비",             value: 200000, color: "#fb923c" },
+    { name: "보험료",             value: 150000, color: "#f87171" },
+    { name: "의료·건강",          value: 150000, color: "#4ade80" },
+    { name: "통신비",             value: 100000, color: "#c084fc" },
+  ];
+
+  const total = data.reduce((s, d) => s + d.value, 0);
+  const cx = 110, cy = 110, r = 80, stroke = 38;
+  const circ = 2 * Math.PI * r;
+  const svg = document.getElementById("donut");
+  const legend = document.getElementById("legend");
+  const fmt = n => n.toLocaleString("ko-KR") + "원";
+
+  let offset = 0;
+  data.forEach((d, i) => {
+    const frac = d.value / total;
+    const len = frac * circ;
+
+    const arc = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    arc.setAttribute("cx", cx);
+    arc.setAttribute("cy", cy);
+    arc.setAttribute("r", r);
+    arc.setAttribute("fill", "none");
+    arc.setAttribute("stroke", d.color);
+    arc.setAttribute("stroke-width", stroke);
+    arc.setAttribute("stroke-dasharray", `${len} ${circ - len}`);
+    arc.setAttribute("stroke-dashoffset", -offset);
+    arc.setAttribute("transform", `rotate(-90 ${cx} ${cy})`);
+    arc.classList.add("arc");
+    arc.dataset.idx = i;
+    svg.appendChild(arc);
+
+    offset += len;
+
+    const pct = (frac * 100).toFixed(1);
+    const row = document.createElement("div");
+    row.className = "legend-row";
+    row.dataset.idx = i;
+    row.innerHTML =
+      `<span class="swatch" style="background:${d.color}"></span>` +
+      `<span class="legend-name">${d.name}</span>` +
+      `<span class="legend-amount">${fmt(d.value)}</span>` +
+      `<span class="legend-pct">${pct}%</span>`;
+    legend.appendChild(row);
+  });
+
+  const arcs = [...svg.querySelectorAll(".arc")];
+  const rows = [...legend.querySelectorAll(".legend-row")];
+  function highlight(idx) {
+    arcs.forEach(a => {
+      const on = a.dataset.idx == idx;
+      a.classList.toggle("active", on);
+      a.classList.toggle("dim", idx !== null && !on);
+    });
+  }
+  function clear() { arcs.forEach(a => a.classList.remove("active", "dim")); }
+  [...arcs, ...rows].forEach(el => {
+    el.addEventListener("mouseenter", () => highlight(el.dataset.idx));
+    el.addEventListener("mouseleave", clear);
+  });
+</script>
+</body>
+</html>
