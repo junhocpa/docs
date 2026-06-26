@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6/25 전표 작성 가이드 (삼성증권 다케다 제약 배당)</title>
+<style>
+  :root {
+    --blue:#1b6ec2; --line:#dfe3e8; --bg:#f6f8fa; --head:#eef3f8;
+    --debit:#0b6b3a; --credit:#b3261e; --muted:#6b7280;
+  }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Segoe UI","Malgun Gothic",sans-serif; margin:0; padding:28px; background:var(--bg); color:#1f2328; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:22px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin-bottom:20px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .card h2 { font-size:15px; margin:0 0 14px; padding-bottom:8px; border-bottom:2px solid var(--blue); color:var(--blue); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:middle; }
+  th { background:var(--head); font-weight:600; white-space:nowrap; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .debit { color:var(--debit); font-weight:600; }
+  .credit { color:var(--credit); font-weight:600; }
+  .chg { background:#fff8e1; font-weight:600; }
+  .memo { font-size:12px; color:#374151; }
+  .pill { display:inline-block; background:var(--head); border:1px solid var(--line); border-radius:6px; padding:2px 8px; font-size:12px; margin-right:6px; }
+  .total td { background:#f0f4f8; font-weight:700; }
+  .ok { color:var(--debit); font-weight:600; }
+  .code { font-family:"SFMono-Regular",Consolas,monospace; background:#f0f2f4; padding:2px 6px; border-radius:4px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .kv { font-size:13px; line-height:1.9; }
+  .kv b { display:inline-block; min-width:96px; color:var(--muted); font-weight:500; }
+  ol { margin:6px 0 0; padding-left:20px; font-size:13px; line-height:1.8; }
+  .note { font-size:12px; color:var(--muted); margin-top:10px; }
+  @media(max-width:680px){ .grid2{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>6/25 전표 작성 가이드</h1>
+<div class="sub">6/18 전표(삼성증권 · 미쓰이물산)를 복사 → <b>다케다 제약</b> 배당 건으로 변경 · 기준 환율 9.5092</div>
+
+<div class="card">
+  <h2>1. 무엇만 바꾸면 되나 (6/18 → 6/25)</h2>
+  <table>
+    <tr><th>항목</th><th>6/18 (원본)</th><th>6/25 (신규)</th></tr>
+    <tr><td>종목</td><td>JPY 미쓰이물산</td><td class="chg">JPY 다케다 제약</td></tr>
+    <tr><td>배당금(총액)</td><td class="num">600,000 JPY</td><td class="num chg">1,200,000 JPY</td></tr>
+    <tr><td>세금(해외)</td><td class="num">91,890 JPY</td><td class="num chg">183,780 JPY</td></tr>
+    <tr><td>실수령(순액)</td><td class="num">508,110 JPY</td><td class="num chg">1,016,220 JPY</td></tr>
+    <tr><td>환율 (거래단가÷100)</td><td class="num">9.4203</td><td class="num chg">9.5092</td></tr>
+  </table>
+  <div class="note">계정과목·거래처·분개 구조는 6/18과 동일. 종목명·금액·환율만 교체합니다.</div>
+</div>
+
+<div class="card">
+  <h2>2. 품의 / 헤더 적요</h2>
+  <div class="kv"><b>적요</b> <span class="code">삼성증권 JPY주식배당입금 JPY 1,016,220*9.5092</span></div>
+  <div class="note">원본이 순액(508,110)을 쓴 것과 동일하게, 순액 1,016,220 기재.</div>
+</div>
+
+<div class="card">
+  <h2>3. 전표 분개 (3줄)</h2>
+  <table>
+    <tr>
+      <th>순번</th><th>차/대</th><th>계정과목</th><th>거래처</th>
+      <th>금액(원)</th><th>외화금액(JPY)</th><th>적요</th>
+    </tr>
+    <tr>
+      <td>1</td><td class="debit">차변</td><td>1030002 외화보통예금</td><td>99046 삼성증권 예탁계좌</td>
+      <td class="num chg">9,663,439</td><td class="num">1,016,220</td>
+      <td class="memo">삼성증권 JPY주식배당입금_다케다제약 JPY 1,016,220*9.5092</td>
+    </tr>
+    <tr>
+      <td>2</td><td class="credit">대변</td><td>9010000 이자수익</td><td>99250 삼성증권_JPY주식</td>
+      <td class="num chg">11,411,040</td><td class="num">1,200,000</td>
+      <td class="memo">삼성증권 JPY주식배당입금_다케다제약 JPY 1,200,000*9.5092</td>
+    </tr>
+    <tr>
+      <td>3</td><td class="debit">차변</td><td>1360000 선납세금</td><td>99250 삼성증권_JPY주식</td>
+      <td class="num chg">1,747,601</td><td class="num">183,780</td>
+      <td class="memo">삼성증권 JPY주식배당입금_다케다제약 JPY 183,780*9.5092</td>
+    </tr>
+    <tr class="total">
+      <td colspan="4">대차 검증</td>
+      <td class="num">차 11,411,040 / 대 11,411,040</td>
+      <td colspan="2" class="ok">일치 ✓</td>
+    </tr>
+  </table>
+  <div class="kv" style="margin-top:12px;">
+    <span class="pill">환종: JPY. 일본엔화</span>
+    <span class="pill">사용부서: 원본과 동일</span>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card" style="margin-bottom:0;">
+    <h2>4. 계산 근거</h2>
+    <div class="kv">
+      <div>이자수익(총배당) = 1,200,000 × 9.5092 = <b style="min-width:auto;color:#1f2328">11,411,040</b></div>
+      <div>선납세금 = 183,780 × 9.5092 = 1,747,600.8 → <b style="min-width:auto;color:#1f2328">1,747,601</b></div>
+      <div>외화보통예금 = 11,411,040 − 1,747,601 = <b style="min-width:auto;color:#1f2328">9,663,439</b></div>
+      <div class="note">(= 1,016,220 × 9.5092, 각 줄 반올림 후 대차 일치)</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    <h2>5. 작업 순서</h2>
+    <ol>
+      <li>종목명 → <b>다케다 제약</b></li>
+      <li>외화금액 3개 → 1,016,220 / 1,200,000 / 183,780</li>
+      <li>환율 → 9.5092</li>
+      <li>금액 3개 → 9,663,439 / 11,411,040 / 1,747,601</li>
+      <li>적요 문구 교체 (위 표)</li>
+    </ol>
+    <div class="note">6/18엔 다이요닛폰산소 건도 있었지만, 6/25엔 다케다 제약 한 건뿐이라 전표는 이 한 장이면 됩니다.</div>
+  </div>
+</div>
+
+</body>
+</html>
