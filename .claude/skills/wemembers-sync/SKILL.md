@@ -19,15 +19,17 @@ description: 위멤버스 수임처정보 엑셀을 Airtable "솔루션택스 �
 |---|---|---|
 | 거래처 (마스터) | `tblM3ud4wVMVQlc2c` | 사업자번호 `fldABqqWpY2cmXpcY` |
 | 소스_위멤버스 | `tblZubQ3Qg0qcesyH` | 사업자번호 `flddr4FHa5hLQ17zj` |
+| 소스_위멤버스_대표자 | `tblxEo3Jc4pkIsTOF` | 항목명 `fld7YVXHxlPMAdb9T` (`이름 — 거래처명`) |
 | 접속정보 | `tblSVIJn4Dixg1nEn` | 항목명 `fldMBUkbAxfEnQ9MF` (예: `홈택스 — 상호`) |
 
 ## 절차
 
 1. **기존 마스터 조회**: ToolSearch로 Airtable 도구 로드 후 `list_records_for_table`(마스터, 필드: 사업자번호·거래처코드·소스)를 페이지네이션으로 전부 조회해 `existing_masters.json`으로 저장한다. 형식: `[{"id": "rec..", "bizno": "...", "code": "ST-0001", "sources": ["위멤버스"]}, ...]`
-2. **변환 스크립트 실행**: `python3 scripts/transform.py <업로드파일.xlsx> <existing_masters.json> <출력폴더>` → 출력폴더에 `master_upsert_*.json`, `source_upsert_*.json`, `access_upsert_*.json`, `report.json` 생성
-3. **upsert 실행** (반드시 이 순서로, 각 파일을 읽어 `update_records_for_table` 호출):
+2. **변환 스크립트 실행**: `python3 scripts/transform.py <업로드파일.xlsx> <existing_masters.json> <출력폴더>` → 출력폴더에 `master_upsert_*.json`, `source_upsert_*.json`(회사정보 컬럼별 필드), `rep_upsert_*.json`(대표자정보 시트), `access_upsert_*.json`, `report.json` 생성
+3. **upsert 실행** (마스터를 먼저, 나머지는 그 후에. 각 파일을 읽어 `update_records_for_table` 호출):
    - 마스터: `performUpsert: {fieldIdsToMergeOn: ["fldABqqWpY2cmXpcY"]}`, `typecast: true`
    - 소스_위멤버스: `performUpsert: {fieldIdsToMergeOn: ["flddr4FHa5hLQ17zj"]}`, `typecast: true`
+   - 소스_위멤버스_대표자: `performUpsert: {fieldIdsToMergeOn: ["fld7YVXHxlPMAdb9T"]}`, `typecast: true`
    - 접속정보: `performUpsert: {fieldIdsToMergeOn: ["fldMBUkbAxfEnQ9MF"]}`, `typecast: true`
    - 배치당 최대 50건. 레코드 수가 많으면 대량 입력을 general-purpose 서브에이전트에 위임한다.
 4. **검증·보고**: `report.json`의 내용(신규 N건·갱신 N건·부여 코드 범위·**이번 파일에서 빠진 기존 거래처 목록**)을 사용자에게 보고한다. 빠진 거래처는 해지 후보일 뿐이므로 **삭제·상태변경은 하지 말고** 목록만 보고한다.

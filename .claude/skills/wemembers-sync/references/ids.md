@@ -23,6 +23,8 @@
 
 ## 소스_위멤버스 — tblZubQ3Qg0qcesyH
 
+기본 필드:
+
 | 필드 | ID | 파일 원천 |
 |---|---|---|
 | 원본명 (primary) | fldlxW8UqBeZ6uaov | 거래처명 |
@@ -30,9 +32,29 @@
 | 대표자 | fldx4UJyMpWAE4I1z | 대표자명 |
 | 연락처 | fldTBpPZtyMbYPh5f | 대표연락처 |
 | 이메일 | fldTxcshnK6ewf1LL | 대표메일 |
-| 원본데이터 | fldjdnED4nObRJikF | 주요 컬럼 key: value 병합 (transform.py 참조) |
+| 원본데이터 | fldjdnED4nObRJikF | (구버전 잔재 — 현재는 컬럼별 필드 사용, 미전송) |
 | 매칭상태 | fldYlJANj6nQnES2S | 자동매칭(기존)/신규생성(신규) |
-| 거래처 링크 | fldRbT8AsNNSh002e | 상호 문자열 (typecast) |
+| 거래처 링크 | fldRbT8AsNNSh002e | 상호 문자열 (typecast, YMK는 recjhgoOjfon8BRCV) |
+
+원본 엑셀 컬럼별 필드 45개(담당자·구분·과세유형·계약상태·개업일·업태·종목·주소·홈택스 계정/비번·여신협회 계정/비번·SNS 매출 계정·원천세신고유형·관할세무서·수임동의·가입경로·CMS·월 기장료·업무량·난이도·법인번호 등)는 `scripts/transform.py`의 `SRC_COLS` 딕셔너리가 원천 컬럼명 → 필드 ID·타입 매핑의 단일 기준이다.
+
+## 소스_위멤버스_대표자 — tblxEo3Jc4pkIsTOF
+
+대표자정보 시트 원본 (공동대표 포함, 거래처당 복수 행). upsert 병합 키: 항목명(`이름 — 거래처명`).
+
+| 필드 | ID |
+|---|---|
+| 항목명 (primary) | fld7YVXHxlPMAdb9T |
+| 거래처명 | fldjpZSuacRNIo6SU |
+| 사업자번호 | fld7jDic6pkvRDPqk |
+| 이름 | fldW0nLbhvavSA8Gp |
+| 주민등록번호 | fldu3bJ7OzluwwdUl |
+| 지분율 | fldAWknIqqxN8GNIQ |
+| 주대표 | fldC3L7Y3xz7aOY1v |
+| 취임일 | fldhfsbhiXaYAa0OJ |
+| 홈택스ID | fldt6INbyX1erqe83 |
+| 홈택스PW | fldMvmkdOuZoVV5ju |
+| 거래처 링크 | fldJhetH57pQoSj2e |
 
 ## 접속정보 — tblSVIJn4Dixg1nEn
 
