@@ -1,0 +1,273 @@
+<title>업무 플랜 대시보드 — 2026.08~10</title>
+<style>
+  :root {
+    --paper: #F7F9F8;
+    --card: #FFFFFF;
+    --ink: #1C2622;
+    --ink-2: #4A5A54;
+    --ink-3: #7C8A85;
+    --line: #E2E8E5;
+    --accent: #0E7A6E;
+    --accent-soft: #D5EAE6;
+    --track: #E8EEEC;
+    --good: #15803D;
+    --warn: #B45309;
+    --crit: #B42318;
+    --warn-soft: #FDF0E3;
+    --crit-soft: #FBEAE8;
+    --good-soft: #E4F3EA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #131A18; --card: #1B2421; --ink: #E7EDEA; --ink-2: #A9B8B2;
+      --ink-3: #71827C; --line: #2C3833; --accent: #4CC2B2; --accent-soft: #17423C;
+      --track: #253029; --good: #5BC981; --warn: #E5A054; --crit: #E5766A;
+      --warn-soft: #3A2C1A; --crit-soft: #3C201D; --good-soft: #1B3626;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #131A18; --card: #1B2421; --ink: #E7EDEA; --ink-2: #A9B8B2;
+    --ink-3: #71827C; --line: #2C3833; --accent: #4CC2B2; --accent-soft: #17423C;
+    --track: #253029; --good: #5BC981; --warn: #E5A054; --crit: #E5766A;
+    --warn-soft: #3A2C1A; --crit-soft: #3C201D; --good-soft: #1B3626;
+  }
+  :root[data-theme="light"] {
+    --paper: #F7F9F8; --card: #FFFFFF; --ink: #1C2622; --ink-2: #4A5A54;
+    --ink-3: #7C8A85; --line: #E2E8E5; --accent: #0E7A6E; --accent-soft: #D5EAE6;
+    --track: #E8EEEC; --good: #15803D; --warn: #B45309; --crit: #B42318;
+    --warn-soft: #FDF0E3; --crit-soft: #FBEAE8; --good-soft: #E4F3EA;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    line-height: 1.55; font-size: 15px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; color: var(--accent); font-weight: 700; text-transform: uppercase; width: 100%; }
+  h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -.01em; }
+  .meta { color: var(--ink-3); font-size: 13px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .tile .label { font-size: 12px; color: var(--ink-3); letter-spacing: .06em; font-weight: 600; }
+  .tile .num { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; margin-top: 2px; }
+  .tile .sub { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+  .cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 24px; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  .card h2 { font-size: 15px; margin: 0 0 14px; font-weight: 700; }
+  .card h2 .hint { font-weight: 400; font-size: 12px; color: var(--ink-3); margin-left: 6px; }
+  .axis { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .axis:first-of-type { border-top: 0; padding-top: 0; }
+  .axis .name { font-size: 13.5px; font-weight: 600; }
+  .axis .pct { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; align-self: center; }
+  .bar { grid-column: 1 / -1; height: 7px; background: var(--track); border-radius: 4px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; min-width: 2px; }
+  .ddl { list-style: none; margin: 0; padding: 0; }
+  .ddl li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .ddl li:first-child { border-top: 0; padding-top: 0; }
+  .ddl .date { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--ink-2); width: 78px; flex-shrink: 0; }
+  .ddl .what { font-size: 13.5px; flex: 1; }
+  .pill { font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 99px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pill.crit { background: var(--crit-soft); color: var(--crit); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.ok   { background: var(--accent-soft); color: var(--accent); }
+  .pill.done { background: var(--good-soft); color: var(--good); }
+  .weeks { display: grid; gap: 10px; }
+  .week { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--card); }
+  .week.now { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .week .wh { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+  .week .wt { font-weight: 700; font-size: 14px; }
+  .week .now-tag { font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 1px 8px; border-radius: 99px; }
+  .week ul { margin: 0; padding: 0; list-style: none; }
+  .week li { font-size: 13.5px; padding: 3px 0 3px 22px; position: relative; color: var(--ink-2); }
+  .week li.tax { color: var(--ink); font-weight: 600; }
+  .week li::before {
+    content: ""; position: absolute; left: 2px; top: 9px; width: 9px; height: 9px;
+    border: 1.5px solid var(--ink-3); border-radius: 3px;
+  }
+  .week li.tax::before { border-color: var(--crit); background: var(--crit-soft); border-radius: 99px; }
+  .week li.done { text-decoration: line-through; color: var(--ink-3); }
+  .week li.done::before { background: var(--good); border-color: var(--good); }
+  footer { margin-top: 28px; color: var(--ink-3); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 14px; }
+  footer code { background: var(--track); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Solution Tax · Business Plan</span>
+    <h1>업무 플랜 대시보드</h1>
+    <span class="meta">2026.08 – 2026.10 · 기준일 <span id="today"></span></span>
+  </header>
+
+  <div class="tiles">
+    <div class="tile"><div class="label">전체 진행률</div><div class="num" id="t-pct">–</div><div class="sub" id="t-cnt"></div></div>
+    <div class="tile"><div class="label">다음 세무 기한</div><div class="num" id="t-ddl">–</div><div class="sub" id="t-ddl-what"></div></div>
+    <div class="tile"><div class="label">이번 주 할 일</div><div class="num" id="t-week">–</div><div class="sub" id="t-week-range"></div></div>
+    <div class="tile"><div class="label">진행 중인 축</div><div class="num">6</div><div class="sub">내부시스템 · 아웃소싱 · 영업 · 홈페이지 · 신규업무 · 기타</div></div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h2>축별 진행률 <span class="hint">태스크 완료 기준</span></h2>
+      <div id="axes"></div>
+    </div>
+    <div class="card">
+      <h2>다가오는 기한 <span class="hint">법정기한 + 내부 마감</span></h2>
+      <ul class="ddl" id="deadlines"></ul>
+    </div>
+  </div>
+
+  <div class="card" style="padding:20px 20px 16px;">
+    <h2>주차별 체크리스트 <span class="hint">상세: schedule-checklist.md · 빨간 점 = 신고 일정</span></h2>
+    <div class="weeks" id="weeks"></div>
+  </div>
+
+  <footer>
+    진행 상태 갱신: 이 파일 하단 <code>DATA</code> 객체에서 완료한 태스크를 <code>done: true</code>로 바꾸면
+    진행률·주차 표시가 자동 반영됩니다. D-day는 열람 시점 기준으로 자동 계산됩니다.
+    원본 플랜: <code>business-plan/README.md</code>
+  </footer>
+</div>
+
+<script>
+const DATA = {
+  axes: [
+    { name: "1. 내부시스템 구축", tasks: [
+      { w: "0803", t: "Airtable 베이스 생성·테이블 세팅", done: false },
+      { w: "0810", t: "거래처 전체 입력·신고일정 등록", done: false },
+      { w: "0817", t: "CMS 견적 비교 / 접속정보 전수조사", done: false },
+      { w: "0824", t: "CMS 계약·동의 수취 / 비밀번호 도구·백업", done: false },
+      { w: "0831", t: "독촉 메시지 템플릿", done: false },
+      { w: "0914", t: "월 마감 매뉴얼 문서화", done: false },
+      { w: "0921", t: "기본급 시장 조사", done: false },
+      { w: "1026", t: "성과급 산식 확정 / 매출 집계 뷰 / 검증 스킬", done: false },
+    ]},
+    { name: "2. 아웃소싱 업무", tasks: [
+      { w: "0914", t: "상품 범위 정의서·요금표 설계", done: false },
+      { w: "0928", t: "표준 계약서 작성", done: false },
+      { w: "1026", t: "YMK 사례서 제작·업셀 제안 개시", done: false },
+    ]},
+    { name: "3. 영업·조직", tasks: [
+      { w: "0817", t: "상담 시트·요금 기준표", done: false },
+      { w: "0824", t: "수임계약서 표준안", done: false },
+      { w: "0914", t: "소개 문구·리워드 기준", done: false },
+      { w: "0921", t: "제휴 후보 리스트업", done: false },
+      { w: "0928", t: "온보딩 체크리스트", done: false },
+      { w: "1026", t: "채용 기준·직무기술서 초안", done: false },
+    ]},
+    { name: "4. 홈페이지 구축", tasks: [
+      { w: "0824", t: "구축 방식·도메인·카카오 채널", done: false },
+      { w: "0907", t: "서비스 소개 원고 착수", done: false },
+      { w: "0928", t: "원고 완성(약력·요금·블로그 2건)", done: false },
+      { w: "1012", t: "사이트 제작", done: false },
+      { w: "1019", t: "상담 동선 테스트·검색 등록", done: false },
+      { w: "1026", t: "오픈·공유", done: false },
+    ]},
+    { name: "5. 신규 업무 (재산제세)", tasks: [
+      { w: "0824", t: "세목별 체크리스트·필요서류", done: false },
+      { w: "0914", t: "양도세 계산 시트 구축", done: false },
+      { w: "0928", t: "실사례 검증", done: false },
+      { w: "1026", t: "수수료 기준표·상담 접수 개시", done: false },
+    ]},
+    { name: "6. 기타 업무 처리", tasks: [
+      { w: "0810", t: "중간예납 대상 검토", done: false },
+      { w: "0817", t: "중간예납 고객 안내", done: false },
+      { w: "0928", t: "부가세 예정 자료 마감 안내 / 월말 KPI 리뷰", done: false },
+      { w: "1026", t: "연말정산 사전 준비·11월 플랜 갱신", done: false },
+    ]},
+  ],
+  deadlines: [
+    { d: "2026-07-27", t: "부가세 1기 확정신고·납부" },
+    { d: "2026-07-31", t: "상반기 근로소득 간이지급명세서" },
+    { d: "2026-08-10", t: "7월분 원천세 신고·납부" },
+    { d: "2026-08-31", t: "법인세 중간예납 / 7월분 간이지급명세서" },
+    { d: "2026-09-10", t: "8월분 원천세 신고·납부" },
+    { d: "2026-09-25", t: "CMS 첫 출금 (내부)" },
+    { d: "2026-09-30", t: "8월분 간이지급명세서" },
+    { d: "2026-10-12", t: "9월분 원천세 신고·납부" },
+    { d: "2026-10-26", t: "부가세 2기 예정신고·납부" },
+    { d: "2026-11-02", t: "9월분 간이지급명세서" },
+  ],
+  weeks: [
+    { key: "0720", label: "시작 전 준비 — 7월 넷째 주 (7/20~8/2)", tax: ["7/27 부가세 1기 확정신고·납부 마감", "7/31 상반기 근로소득 간이지급명세서 제출"] },
+    { key: "0803", label: "8월 1주 (8/3~8/9)", tax: ["월초 루틴: 자료 수취·증빙 요청·급여 마감"] },
+    { key: "0810", label: "8월 2주 (8/10~8/16)", tax: ["8/10 원천세 신고·납부"] },
+    { key: "0817", label: "8월 3주 (8/17~8/23)", tax: [] },
+    { key: "0824", label: "8월 4주 (8/24~8/30)", tax: [] },
+    { key: "0831", label: "8월 5주 (8/31~9/6)", tax: ["8/31 법인세 중간예납·간이지급명세서", "월초 루틴"] },
+    { key: "0907", label: "9월 2주 (9/7~9/13)", tax: ["9/10 원천세 신고·납부"] },
+    { key: "0914", label: "9월 3주 (9/14~9/20)", tax: [] },
+    { key: "0921", label: "9월 4주 (9/21~9/27) · 추석 9/24~26", tax: ["월 마감 검토 9/21~23 앞당겨 처리"] },
+    { key: "0928", label: "9월 5주 (9/28~10/4)", tax: ["9/30 간이지급명세서", "부가세 예정 준비 시작"] },
+    { key: "1005", label: "10월 2주 (10/5~10/11)", tax: ["월초 루틴 + 부가세 자료 수취"] },
+    { key: "1012", label: "10월 3주 (10/12~10/18)", tax: ["10/12 원천세 신고·납부", "부가세 입력·검토 집중"] },
+    { key: "1019", label: "10월 4주 (10/19~10/25)", tax: ["부가세 신고서 작성·검토"] },
+    { key: "1026", label: "10월 5주 (10/26~11/1)", tax: ["10/26 부가세 예정신고 마감", "11/2 간이지급명세서"] },
+  ],
+};
+
+const fmt = (n) => n.toLocaleString("ko-KR");
+const today = new Date(); today.setHours(0,0,0,0);
+document.getElementById("today").textContent =
+  `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,"0")}.${String(today.getDate()).padStart(2,"0")}`;
+
+// 축별 진행률
+const allTasks = DATA.axes.flatMap(a => a.tasks);
+const doneCnt = allTasks.filter(t => t.done).length;
+document.getElementById("t-pct").textContent = Math.round(doneCnt / allTasks.length * 100) + "%";
+document.getElementById("t-cnt").textContent = `태스크 ${fmt(doneCnt)} / ${fmt(allTasks.length)} 완료`;
+
+const axesEl = document.getElementById("axes");
+DATA.axes.forEach(a => {
+  const d = a.tasks.filter(t => t.done).length, n = a.tasks.length;
+  const pct = Math.round(d / n * 100);
+  const row = document.createElement("div");
+  row.className = "axis";
+  row.innerHTML = `<span class="name">${a.name}</span><span class="pct">${pct}% · ${d}/${n}</span>
+    <div class="bar"><i style="width:${Math.max(pct, 1)}%"></i></div>`;
+  axesEl.appendChild(row);
+});
+
+// 기한 목록 + D-day
+const ddlEl = document.getElementById("deadlines");
+let nextDdl = null;
+DATA.deadlines.forEach(x => {
+  const dt = new Date(x.d + "T00:00:00");
+  const days = Math.round((dt - today) / 86400000);
+  if (days >= 0 && !nextDdl) nextDdl = { ...x, days };
+  const li = document.createElement("li");
+  const label = days < 0 ? "지남" : days === 0 ? "D-Day" : `D-${days}`;
+  const cls = days < 0 ? "done" : days <= 3 ? "crit" : days <= 10 ? "warn" : "ok";
+  const dstr = x.d.slice(5).replace("-", "/") + ` (${"일월화수목금토"[dt.getDay()]})`;
+  li.innerHTML = `<span class="date">${dstr}</span><span class="what">${x.t}</span><span class="pill ${cls}">${label}</span>`;
+  ddlEl.appendChild(li);
+});
+if (nextDdl) {
+  document.getElementById("t-ddl").textContent = nextDdl.days === 0 ? "D-Day" : `D-${nextDdl.days}`;
+  document.getElementById("t-ddl-what").textContent = `${nextDdl.d.slice(5).replace("-","/")} ${nextDdl.t}`;
+}
+
+// 주차별 뷰
+const weekStart = (k) => new Date(`2026-${k.slice(0,2)}-${k.slice(2)}T00:00:00`);
+const weeksEl = document.getElementById("weeks");
+let thisWeekCount = 0, thisWeekLabel = "플랜 시작 전";
+DATA.weeks.forEach((w, i) => {
+  const start = weekStart(w.key);
+  const next = DATA.weeks[i+1] ? weekStart(DATA.weeks[i+1].key) : new Date("2026-11-02T00:00:00");
+  const isNow = today >= start && today < next;
+  const tasks = allTasks.filter(t => t.w === w.key);
+  if (isNow) { thisWeekCount = w.tax.length + tasks.filter(t => !t.done).length; thisWeekLabel = w.label; }
+  const box = document.createElement("div");
+  box.className = "week" + (isNow ? " now" : "");
+  const items = [
+    ...w.tax.map(t => `<li class="tax">${t}</li>`),
+    ...tasks.map(t => `<li class="${t.done ? "done" : ""}">${t.t}</li>`),
+  ].join("");
+  box.innerHTML = `<div class="wh"><span class="wt">${w.label}</span>${isNow ? '<span class="now-tag">이번 주</span>' : ""}</div><ul>${items}</ul>`;
+  weeksEl.appendChild(box);
+});
+document.getElementById("t-week").textContent = fmt(thisWeekCount) + "건";
+document.getElementById("t-week-range").textContent = thisWeekLabel;
+</script>
