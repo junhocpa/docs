@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-YMK 재고수불 자동전표 워크북 생성 템플릿 (지침 v1.2)
+YMK 재고수불 자동전표 워크북 생성 템플릿 (지침 v1.3)
 
 사용법:
-  1) 재고현황(출고현황)·분개장을 로드해 규칙 1~9를 적용하고, 아래 ROWS/COPY_REF/
+  1) 재고현황(출고현황)·분개장을 로드해 규칙 1~11을 적용하고, 아래 ROWS/COPY_REF/
      VENDORS/PJTS/ACCTS 를 이번 달 데이터로 채운다. (규칙 적용은 references/rules.md 참조)
   2) python build_voucher.py 실행 → outputs 폴더에 워크북 생성.
   3) recalc.py 로 재계산 후, 선행 0·차대검증을 재확인한다.
 
 핵심: 코드성 값(작성일자/회계단위/거래처/PJT)은 문자열로 넣고 텍스트 서식('@')을 적용해
 선행 0을 보존한다. T~V(전표복사 참조)는 더존 업로드 대상이 아니다(A~S만 업로드).
+타계정구분(규칙 11)은 업로드 양식에 없다 — 입력 후 더존에서 지정하고 원장으로 검증한다.
 """
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -19,7 +20,7 @@ import os
 
 # ============== 이번 달 파라미터 (매월 수정) ==============
 YEAR, MONTH = 2026, 5
-VERSION = "v1.2"
+VERSION = "v1.3"
 # 출력 경로: 환경변수 > Claude.ai outputs 폴더 > 현재 작업폴더 순으로 자동 선택
 OUTPUT_DIR = os.environ.get("YMK_OUTPUT_DIR") or (
     "/mnt/user-data/outputs" if os.path.isdir("/mnt/user-data/outputs") else "."
@@ -27,6 +28,9 @@ OUTPUT_DIR = os.environ.get("YMK_OUTPUT_DIR") or (
 OUT = os.path.join(OUTPUT_DIR, f"YMK_재고수불_자동전표_{YEAR}년{MONTH:02d}월_{VERSION}.xlsx")
 
 # 자동전표 라인: (작성일 YYYYMMDD, 전표번호, 라인순번, 계정코드, 차대(3/4), 적요, 금액, 거래처5자리, 부서 or None, PJT6자리 or None, 품의)
+# 타프로젝트대체는 양쪽 차변(3)에 +/- 금액, 적요 선례형식(규칙 8):
+#   (+) "타프로젝트에서 대체액" 새PJT / (-) "타프로젝트로 대체액" 원PJT, 품의 "타프로젝트대체"
+# 연구개발비대체(규칙 10): 차변 경상연구개발비(제조 523)/PJT "000093", 대변 원재료.
 ROWS = [
     ("20260515", 1, 1, 1460000, 3, "타계정에서 대체액", 77873, "03340", None,   None,     "타계정대체"),
     ("20260515", 1, 2, 1490000, 4, "타계정으로 대체액", 77873, "03340", "2000", "000001", "타계정대체"),
